@@ -38,3 +38,8 @@ Step 7: Run all the seeders
 ```
 node_modules/.bin/sequelize db:seed:all
 ```
+
+
+### References
+
+* Nice article to understand working with Sequelize https://stackabuse.com/using-sequelize-js-and-sqlite-in-an-express-js-app/
