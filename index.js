@@ -232,7 +232,7 @@ app.post("/api/team/process", async (req, res) => {
         const b_skill = a.playerSkills.find(x => x.skill === tr.mainSkill)
 
         if(a_skill && b_skill) {
-          return a_skill.value - b_skill.value;
+          return b_skill.value - a_skill.value;
         } else if(a_skill && !b_skill) {
           return 1;
         } else if(!a_skill && b_skill) {
@@ -245,7 +245,7 @@ app.post("/api/team/process", async (req, res) => {
           const a_max_skill = a.playerSkills.map(x => x.value).max();
           const b_max_skill = b.playerSkills.map(x => x.value).max();
 
-          return a_max_skill - b_max_skill;
+          return b_max_skill - a_max_skill;
         }
       })
       .slice(0, tr.numberOfPlayers);
