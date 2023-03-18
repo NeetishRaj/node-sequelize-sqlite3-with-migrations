@@ -3,6 +3,10 @@ const bodyParser = require("body-parser");
 const jwt = require("jsonwebtoken");
 
 const db = require("./models");
+const {
+  get_team_process_query,
+  is_position_count_valid,
+} = require("./Queries/sql_queries");
 
 const app = express();
 const SECRET_PASSWORD = "somethingsecret";
@@ -186,8 +190,7 @@ app.delete("/api/player/:playerId", async (req, res) => {
 });
 
 app.post("/api/auth", (req, res) => {
-  // var hashedPassword = bcrypt.hashSync(req.body.password, 8);
-  var token = jwt.sign(
+  const token = jwt.sign(
     { user: "Authorised User for deletion" },
     SECRET_PASSWORD,
     {
@@ -196,6 +199,66 @@ app.post("/api/auth", (req, res) => {
   );
 
   res.status(200).send({ token });
+});
+
+app.post("/api/team/process", async (req, res) => {
+  const teamReq = req.body;
+  try {
+    let players = await db.sequelize.query(get_team_process_query(teamReq));
+    players = players[0];
+    const result = [];
+
+    for (let i = 0; i < players.length; i++) {
+      let playerSkills = await db.Skills.findAll({
+        where: { playerId: players[i].id },
+      });
+      playerSkills = playerSkills.map(x => x.dataValues);
+      result.push({
+        ...players[i],
+        playerSkills,
+      });
+    }
+
+    if (!is_position_count_valid(result, teamReq)){
+      return res.status(400).send("Players are missing for some positions");
+    } 
+    let finalResult = [];
+
+    for (const tr of teamReq) {
+      const trPlayers = result
+      .filter(x => x.position === tr.position)
+      .sort((a, b) => {
+        const a_skill = a.playerSkills.find(x => x.skill === tr.mainSkill)
+        const b_skill = a.playerSkills.find(x => x.skill === tr.mainSkill)
+
+        if(a_skill && b_skill) {
+          return a_skill.value - b_skill.value;
+        } else if(a_skill && !b_skill) {
+          return 1;
+        } else if(!a_skill && b_skill) {
+          return -1;
+        } else {
+          Array.prototype.max = function() {
+            return Math.max.apply(null, this);
+          };
+
+          const a_max_skill = a.playerSkills.map(x => x.value).max();
+          const b_max_skill = b.playerSkills.map(x => x.value).max();
+
+          return a_max_skill - b_max_skill;
+        }
+      })
+      .slice(0, tr.numberOfPlayers);
+
+      finalResult = [...finalResult, ...trPlayers];    }
+    
+    return res.status(200).send(finalResult);
+  } catch (error) {
+    console.log(
+      "Error fetching team process details\n" + JSON.stringify(error)
+    );
+    return res.status(500).send(error);
+  }
 });
 
 app.listen(3000, () => {

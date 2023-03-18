@@ -33,7 +33,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"name\": \"Balraj Sah\",\n    \"position\": \"midfielder\",\n    \"playerSkills\": [\n        {\n            \"skill\": \"stamina\",\n            \"value\": 49\n        },\n        {\n            \"skill\": \"speed\",\n            \"value\": 99\n        }\n    ]\n}",
+					"raw": "{\n    \"name\": \"Raveja Hassi\",\n    \"position\": \"midfielder\",\n    \"playerSkills\": [\n        {\n            \"skill\": \"defence\",\n            \"value\": 60\n        },\n        {\n            \"skill\": \"attack\",\n            \"value\": 40\n        },\n        {\n            \"skill\": \"speed\",\n            \"value\": 30\n        }\n    ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -160,6 +160,37 @@
 					"path": [
 						"api",
 						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/api/team/process",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n    {\n        \"position\": \"midfielder\",\n        \"mainSkill\": \"speed\",\n        \"numberOfPlayers\": 1\n    },\n    {\n        \"position\": \"defender\",\n        \"mainSkill\": \"strength\",\n        \"numberOfPlayers\": 2\n    }\n]"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/team/process",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"team",
+						"process"
 					]
 				}
 			},
